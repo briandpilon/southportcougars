@@ -213,11 +213,6 @@ function BFLStandings() {
       return next;
     });
   };
-  const resetAll = () => {
-    if (!window.confirm("Clear every recorded result? This can't be undone.")) return;
-    setResults({});
-    persist({});
-  };
   const standings = useMemo(() => {
     const table = {};
     Object.keys(TEAMS).forEach(code => {
@@ -644,20 +639,7 @@ function BFLStandings() {
       letterSpacing: 1,
       color: "#4E698A"
     }
-  }, saveState === "saving" && "SAVING…", saveState === "saved" && "SAVED", saveState === "error" && "SAVE FAILED — TRY AGAIN"), /*#__PURE__*/React.createElement("button", {
-    onClick: resetAll,
-    style: {
-      background: "transparent",
-      border: `1px solid ${PANEL_BORDER}`,
-      color: MUTED,
-      fontFamily: "'Oswald', sans-serif",
-      fontSize: 11,
-      letterSpacing: 1,
-      padding: "7px 14px",
-      borderRadius: 6,
-      cursor: "pointer"
-    }
-  }, "RESET ALL RESULTS")), /*#__PURE__*/React.createElement("div", {
+  }, saveState === "saving" && "SAVING…", saveState === "saved" && "SAVED", saveState === "error" && "SAVE FAILED — TRY AGAIN")), /*#__PURE__*/React.createElement("div", {
     style: {
       textAlign: "center",
       marginTop: 30,
