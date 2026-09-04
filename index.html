@@ -240,11 +240,19 @@ function BFLStandings() {
         table[loser].played += 1;
       });
     });
-    return Object.values(table).sort((a, b) => {
+    const sorted = Object.values(table).sort((a, b) => {
       if (b.wins !== a.wins) return b.wins - a.wins;
       if (a.losses !== b.losses) return a.losses - b.losses;
       return TEAMS[a.code].localeCompare(TEAMS[b.code]);
     });
+    // Standard competition ranking: teams with an identical W-L record
+    // share the same (highest) seed, and the next distinct record skips
+    // ahead by however many teams tied for the seed above it.
+    sorted.forEach((row, i) => {
+      const prev = sorted[i - 1];
+      row.seed = prev && prev.wins === row.wins && prev.losses === row.losses ? prev.seed : i + 1;
+    });
+    return sorted;
   }, [results]);
   const gamesRecorded = SCHEDULE.reduce((sum, {
     week
@@ -463,7 +471,7 @@ function BFLStandings() {
         color: MUTED,
         fontSize: 15
       }
-    }, i + 1), /*#__PURE__*/React.createElement("span", {
+    }, row.seed), /*#__PURE__*/React.createElement("span", {
       style: {
         display: "flex",
         alignItems: "center",
