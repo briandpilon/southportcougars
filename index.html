@@ -127,19 +127,43 @@ const LEVELS = {
 // This dashboard is static: results only change when this file is edited
 // and republished. There is no viewer-facing editing, no localStorage --
 // every visitor sees exactly the same page.
+//
+// Each recorded game is { winner, scores: { <teamCode>: <points>, ... } }.
 const RESULTS_BY_LEVEL = {
   varsity: {
-    // Week 1: Panthers beat Bucs 13-7; Cougars beat Chiefs 27-13
     1: {
-      field1: "Panthers",
-      field2: "Cougars"
+      field1: {
+        winner: "Panthers",
+        scores: {
+          Bucs: 7,
+          Panthers: 13
+        }
+      },
+      field2: {
+        winner: "Cougars",
+        scores: {
+          Cougars: 27,
+          Chiefs: 13
+        }
+      }
     }
   },
   jv: {
-    // Week 1: JV Panthers beat JV Bucs 6-2; JV Chiefs beat JV Cougars 37-0
     1: {
-      field1: "Panthers",
-      field2: "Chiefs"
+      field1: {
+        winner: "Panthers",
+        scores: {
+          Bucs: 2,
+          Panthers: 6
+        }
+      },
+      field2: {
+        winner: "Chiefs",
+        scores: {
+          Cougars: 0,
+          Chiefs: 37
+        }
+      }
     }
   }
 };
@@ -198,7 +222,8 @@ function BFLStandings() {
     }) => {
       const wr = results[week];
       if (!wr) return;
-      [[field1, wr.field1], [field2, wr.field2]].forEach(([matchup, winner]) => {
+      [[field1, wr.field1], [field2, wr.field2]].forEach(([matchup, game]) => {
+        const winner = game && game.winner;
         if (!winner) return;
         const loser = matchup.find(t => t !== winner);
         if (!loser) return;
@@ -608,11 +633,11 @@ function BFLStandings() {
     }, /*#__PURE__*/React.createElement(GameRow, {
       label: "F1",
       teams: field1,
-      winner: wr.field1
+      game: wr.field1
     }), /*#__PURE__*/React.createElement(GameRow, {
       label: "F2",
       teams: field2,
-      winner: wr.field2
+      game: wr.field2
     }), /*#__PURE__*/React.createElement("div", {
       style: {
         fontFamily: "'Oswald', sans-serif",
@@ -641,8 +666,10 @@ function BFLStandings() {
 function GameRow({
   label,
   teams,
-  winner
+  game
 }) {
+  const winner = game && game.winner;
+  const scores = game && game.scores;
   return /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
@@ -670,7 +697,11 @@ function GameRow({
       key: team,
       style: {
         flex: 1,
-        padding: "8px 8px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 6,
+        padding: "8px 10px",
         borderRadius: 6,
         border: isWinner ? `1px solid ${TEAM_COLORS[team].bg}` : "1px solid #22405F",
         background: isWinner ? TEAM_COLORS[team].bg : "#0C1E32",
@@ -678,10 +709,15 @@ function GameRow({
         fontFamily: "'Oswald', sans-serif",
         fontSize: 12,
         letterSpacing: 0.3,
-        fontWeight: isWinner ? 700 : 500,
-        textAlign: "center"
+        fontWeight: isWinner ? 700 : 500
       }
-    }, TEAMS[team]);
+    }, /*#__PURE__*/React.createElement("span", null, TEAMS[team]), scores && /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontFamily: "'Anton', sans-serif",
+        fontSize: 15,
+        letterSpacing: 0
+      }
+    }, scores[team]));
   })));
 }
 const root = ReactDOM.createRoot(document.getElementById("root"));
